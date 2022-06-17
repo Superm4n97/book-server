@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/Superm4n97/Book-Server/actions"
+	"github.com/Superm4n97/Book-Server/middlewares"
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 	"net/http"
 )
 
@@ -14,7 +14,9 @@ func pong(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	r := chi.NewRouter()
-	r.Use(middleware.Logger)
+
+	r.Use(middlewares.Authentication)
+
 	r.Get("/ping", pong)
 	r.Get("/apis/v1/books", actions.GetAllBooks)
 	r.Post("/apis/v1/books", actions.AddNewBook)

@@ -11,3 +11,6 @@ type Book struct {
 	ISBN    string   `json:"isbn"`
 	Authors []Author `json:"authors"`
 }
+
+var AdminUsername = "admin"
+var AdminPassword = "1234"
