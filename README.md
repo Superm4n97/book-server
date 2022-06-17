@@ -1,2 +1,2 @@
 # Book-Server
-Go, Chi
+API Server using Go and Chi
