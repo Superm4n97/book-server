@@ -13,10 +13,7 @@ func basicAuth(req http.Handler, w http.ResponseWriter, r *http.Request, enStr s
 	decodedInfo, err := base64.StdEncoding.DecodeString(enStr)
 
 	if err != nil {
-
-		http.Error(w, http.StatusText(401), 401)
-		w.Write([]byte("Invalid Authorization!!!!"))
-
+		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
@@ -26,10 +23,7 @@ func basicAuth(req http.Handler, w http.ResponseWriter, r *http.Request, enStr s
 	//fmt.Println("password :", usernamePassword[1])
 
 	if model.UserInfo[usernamePassword[0]] != usernamePassword[1] {
-
-		http.Error(w, http.StatusText(401), 401)
-		w.Write([]byte("Invalid Authorization!!!!"))
-
+		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
@@ -72,8 +66,6 @@ func Authentication(next http.Handler) http.Handler {
 
 		if authHeader == "" {
 			w.WriteHeader(http.StatusUnauthorized)
-			w.Write([]byte("Unauthorized!!!!"))
-
 			return
 		}
 
@@ -81,8 +73,6 @@ func Authentication(next http.Handler) http.Handler {
 
 		if len(authorizationInfo) != 2 {
 			w.WriteHeader(http.StatusUnauthorized)
-			w.Write([]byte("Invalid Authorization!!!!"))
-
 			return
 		}
 

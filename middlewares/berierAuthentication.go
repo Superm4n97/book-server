@@ -33,7 +33,7 @@ func BearerAuthentication(req http.Handler) http.Handler {
 
 		if clms, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 			//fmt.Println("Token Matched !!!!")
-			w.Write([]byte("Token Matched, valid user"))
+			//w.Write([]byte("Token Matched, valid user"))
 			fmt.Println(clms["userName"])
 		} else {
 			fmt.Println(err)

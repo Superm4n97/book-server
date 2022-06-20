@@ -21,12 +21,18 @@ func GetBookInfoWithID(w http.ResponseWriter, r *http.Request) {
 	if err != nil || Books[bid].Title == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("Invalid book id"))
-
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(Books[bid])
+	err = json.NewEncoder(w).Encode(Books[bid])
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	return
 }
 
 //GetAllBooks gives the response about all the books in the Books
@@ -39,9 +45,14 @@ func GetAllBooks(w http.ResponseWriter, r *http.Request) {
 		booksSlice = append(booksSlice, val)
 	}
 
-	json.NewEncoder(w).Encode(booksSlice)
+	err := json.NewEncoder(w).Encode(booksSlice)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
-	//json.NewEncoder(w).Encode(testdir.GetTestStruct())
+	w.WriteHeader(http.StatusOK)
+	return
 }
 
 func AddNewBook(w http.ResponseWriter, r *http.Request) {
@@ -54,7 +65,6 @@ func AddNewBook(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&book)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(err.Error()))
 		return
 	}
 
@@ -65,6 +75,7 @@ func AddNewBook(w http.ResponseWriter, r *http.Request) {
 		log.Println("failed to write data in response body")
 	}
 	w.WriteHeader(http.StatusOK)
+	return
 }
 
 func UpdateBookInformation(w http.ResponseWriter, r *http.Request) {
@@ -75,8 +86,6 @@ func UpdateBookInformation(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil || Books[bookId].Title == "" {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("Inappropriate update operation."))
-
 		return
 	}
 
@@ -85,22 +94,25 @@ func UpdateBookInformation(w http.ResponseWriter, r *http.Request) {
 
 	if e != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("Invalid JSON format"))
-
 		return
 	}
 
 	if book.Id != bookId {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("Book Id mismatched"))
-
 		return
 	}
 
 	Books[bookId] = book
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(book)
+	err = json.NewEncoder(w).Encode(book)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	return
 }
 
 func RemoveBookFromList(w http.ResponseWriter, r *http.Request) {
@@ -109,14 +121,12 @@ func RemoveBookFromList(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil || Books[bookId].Title == "" {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("Invalid book id for deletion!!!"))
-
 		return
 	}
 
 	delete(Books, bookId)
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Successfully deleted!!!"))
+	return
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
@@ -139,15 +149,18 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	if model.UserInfo[infoStr[0]] != infoStr[1] {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("Invalid Username/Password!!!"))
-
 		return
 	}
-
-	w.Write([]byte("Successfully Loged In........"))
 
 	//
 	//============GENERATE TOKEN===================
 	st := middlewares.CreateJwtToken(infoStr[0], infoStr[1])
-	w.Write([]byte(st))
+	_, err := w.Write([]byte(st))
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	return
 }

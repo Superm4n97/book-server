@@ -9,7 +9,14 @@ import (
 )
 
 func pong(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("pong"))
+	_, err := w.Write([]byte("pong"))
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	return
 }
 
 func main() {
@@ -36,8 +43,11 @@ func main() {
 	//r.Delete("/apis/v1/books/{id}", handlers.RemoveBookFromList)
 
 	fmt.Println("Server Running on port: 8080")
-	http.ListenAndServe(":8080", r)
-
+	err := http.ListenAndServe(":8080", r)
+	if err != nil {
+		fmt.Println("Failed to start the server")
+		return
+	}
 }
 
 /*
