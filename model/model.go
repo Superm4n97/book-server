@@ -1,4 +1,4 @@
-package info
+package model
 
 type Author struct {
 	Name  string `json:"name"`
@@ -16,4 +16,4 @@ var UserInfo = map[string]string{
 	"admin": "1234",
 }
 
-var ServerSecretKey = "secret"
+var ServerSecretKey = "Superm4n"

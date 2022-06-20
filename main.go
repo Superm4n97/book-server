@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/Superm4n97/Book-Server/actions"
+	"github.com/Superm4n97/Book-Server/handlers"
 	"github.com/Superm4n97/Book-Server/middlewares"
 	"github.com/go-chi/chi/v5"
 	"net/http"
@@ -15,25 +15,25 @@ func pong(w http.ResponseWriter, r *http.Request) {
 func main() {
 	r := chi.NewRouter()
 
-	//r.Use(middlewares.BasicAuthentication)
+	//r.Use(middlewares.Authentication)
 	r.Get("/ping", pong)
 	r.Route("/apis/v1/books", func(r chi.Router) {
-		//r.Use(middlewares.BasicAuthentication)
-		r.Use(middlewares.BearerAuthentication)
+		//r.Use(middlewares.Authentication)
+		r.Use(middlewares.Authentication)
 
-		r.Get("/", actions.GetAllBooks)
-		r.Post("/", actions.AddNewBook)
-		r.Get("/{id}", actions.GetBookInfoWithID)
-		r.Put("/{id}", actions.UpdateBookInformation)
-		r.Delete("/{id}", actions.RemoveBookFromList)
+		r.Get("/", handlers.GetAllBooks)
+		r.Post("/", handlers.AddNewBook)
+		r.Get("/{id}", handlers.GetBookInfoWithID)
+		r.Put("/{id}", handlers.UpdateBookInformation)
+		r.Delete("/{id}", handlers.RemoveBookFromList)
 	})
-	r.Post("/apis/v1/login", actions.Login)
+	r.Post("/apis/v1/login", handlers.Login)
 
-	//r.Get("/apis/v1/books", actions.GetAllBooks)
-	//r.Post("/apis/v1/books", actions.AddNewBook)
-	//r.Get("/apis/v1/books/{id}", actions.GetBookInfoWithID)
-	//r.Put("/apis/v1/books/{id}", actions.UpdateBookInformation)
-	//r.Delete("/apis/v1/books/{id}", actions.RemoveBookFromList)
+	//r.Get("/apis/v1/books", handlers.GetAllBooks)
+	//r.Post("/apis/v1/books", handlers.AddNewBook)
+	//r.Get("/apis/v1/books/{id}", handlers.GetBookInfoWithID)
+	//r.Put("/apis/v1/books/{id}", handlers.UpdateBookInformation)
+	//r.Delete("/apis/v1/books/{id}", handlers.RemoveBookFromList)
 
 	fmt.Println("Server Running on port: 8080")
 	http.ListenAndServe(":8080", r)
@@ -65,5 +65,6 @@ JSON Format Data
 Admin JWT Token
 ==================
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXNzIjoiMTIzNCIsInVzZXJOYW1lIjoiYWRtaW4ifQ.DX81oiggc9PA0qhU-LSJflUUTmqfOU1sig4wk39DPmA
-
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXNzIjoiMTIzNCIsInVzZXJOYW1lIjoiYWRtaW4ifQ.DX81oiggc9PA0qhU-LSJflUUTmqfOU1sig4wk39DPmA
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6IjEyMzQifQ.-i0If6mLRGHQeXDkK_NQbqxjfJbvKXcVU6GF6e55FuM
 */

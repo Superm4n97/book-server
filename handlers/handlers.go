@@ -1,11 +1,10 @@
-package actions
+package handlers
 
 import (
 	"encoding/base64"
 	"encoding/json"
-	"github.com/Superm4n97/Book-Server/info"
 	"github.com/Superm4n97/Book-Server/middlewares"
-	"github.com/Superm4n97/Book-Server/testdir"
+	"github.com/Superm4n97/Book-Server/model"
 	"github.com/go-chi/chi/v5"
 	"log"
 	"net/http"
@@ -13,7 +12,7 @@ import (
 	"strings"
 )
 
-var Books = make(map[int]info.Book)
+var Books = make(map[int]model.Book)
 
 func GetBookInfoWithID(w http.ResponseWriter, r *http.Request) {
 	bookId := chi.URLParam(r, "id")
@@ -35,20 +34,20 @@ func GetBookInfoWithID(w http.ResponseWriter, r *http.Request) {
 func GetAllBooks(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	var booksSlice []info.Book
+	var booksSlice []model.Book
 	for _, val := range Books {
 		booksSlice = append(booksSlice, val)
 	}
 
-	//json.NewEncoder(w).Encode(booksSlice)
+	json.NewEncoder(w).Encode(booksSlice)
 
-	json.NewEncoder(w).Encode(testdir.GetTestStruct())
+	//json.NewEncoder(w).Encode(testdir.GetTestStruct())
 }
 
 func AddNewBook(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	var book info.Book
+	var book model.Book
 
 	//the JSON request is converted into a [string]string map
 	//element can be accessed by request["json_field_name"]
@@ -81,7 +80,7 @@ func UpdateBookInformation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var book info.Book
+	var book model.Book
 	e := json.NewDecoder(r.Body).Decode(&book)
 
 	if e != nil {
@@ -138,7 +137,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	temp, _ := base64.StdEncoding.DecodeString(infoStr[1])
 	infoStr = strings.Split(string(temp), ":")
 
-	if info.UserInfo[infoStr[0]] != infoStr[1] {
+	if model.UserInfo[infoStr[0]] != infoStr[1] {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("Invalid Username/Password!!!"))
 

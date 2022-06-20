@@ -2,7 +2,7 @@ package middlewares
 
 import (
 	"fmt"
-	"github.com/Superm4n97/Book-Server/info"
+	"github.com/Superm4n97/Book-Server/model"
 	"github.com/golang-jwt/jwt"
 	"net/http"
 	"strings"
@@ -28,7 +28,7 @@ func BearerAuthentication(req http.Handler) http.Handler {
 				return nil, fmt.Errorf("Unexpected signing method: %v", tkn.Header["alg"])
 			}
 
-			return []byte(info.ServerSecretKey), nil
+			return []byte(model.ServerSecretKey), nil
 		})
 
 		if clms, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
