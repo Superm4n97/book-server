@@ -12,5 +12,8 @@ type Book struct {
 	Authors []Author `json:"authors"`
 }
 
-var AdminUsername = "admin"
-var AdminPassword = "1234"
+var UserInfo = map[string]string{
+	"admin": "1234",
+}
+
+var ServerSecretKey = "secret"

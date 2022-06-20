@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func Authentication(req http.Handler) http.Handler {
+func BasicAuthentication(req http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		//uname, pass, ok := r.BasicAuth()
@@ -45,7 +45,7 @@ func Authentication(req http.Handler) http.Handler {
 		//fmt.Println("username :", usernamePassword[0])
 		//fmt.Println("password :", usernamePassword[1])
 
-		if usernamePassword[0] != info.AdminUsername || usernamePassword[1] != info.AdminPassword {
+		if info.UserInfo[usernamePassword[0]] != usernamePassword[1] {
 
 			http.Error(w, http.StatusText(401), 401)
 			w.Write([]byte("Invalid Authorization!!!!"))
@@ -56,6 +56,5 @@ func Authentication(req http.Handler) http.Handler {
 		req.ServeHTTP(w, r)
 
 		//w.Write([]byte("middleman is working!!!!!!!!!!"))
-
 	})
 }

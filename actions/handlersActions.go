@@ -1,12 +1,16 @@
 package actions
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"github.com/Superm4n97/Book-Server/info"
+	"github.com/Superm4n97/Book-Server/middlewares"
+	"github.com/Superm4n97/Book-Server/testdir"
 	"github.com/go-chi/chi/v5"
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 var Books = make(map[int]info.Book)
@@ -36,7 +40,9 @@ func GetAllBooks(w http.ResponseWriter, r *http.Request) {
 		booksSlice = append(booksSlice, val)
 	}
 
-	json.NewEncoder(w).Encode(booksSlice)
+	//json.NewEncoder(w).Encode(booksSlice)
+
+	json.NewEncoder(w).Encode(testdir.GetTestStruct())
 }
 
 func AddNewBook(w http.ResponseWriter, r *http.Request) {
@@ -112,4 +118,37 @@ func RemoveBookFromList(w http.ResponseWriter, r *http.Request) {
 	delete(Books, bookId)
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Successfully deleted!!!"))
+}
+
+func Login(w http.ResponseWriter, r *http.Request) {
+	headerString := r.Header.Get("Authorization")
+
+	if headerString == "" {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	infoStr := strings.Split(headerString, " ")
+
+	if len(infoStr) != 2 || infoStr[0] != "Basic" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	temp, _ := base64.StdEncoding.DecodeString(infoStr[1])
+	infoStr = strings.Split(string(temp), ":")
+
+	if info.UserInfo[infoStr[0]] != infoStr[1] {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("Invalid Username/Password!!!"))
+
+		return
+	}
+
+	w.Write([]byte("Successfully Loged In........"))
+
+	//
+	//============GENERATE TOKEN===================
+	st := middlewares.CreateJwtToken(infoStr[0], infoStr[1])
+	w.Write([]byte(st))
 }
