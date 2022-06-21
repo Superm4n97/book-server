@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"github.com/Superm4n97/Book-Server/model"
 	"github.com/golang-jwt/jwt"
@@ -9,12 +10,11 @@ import (
 	"strings"
 )
 
-func basicAuth(req http.Handler, w http.ResponseWriter, r *http.Request, enStr string) {
+func basicAuth(enStr string) error {
 	decodedInfo, err := base64.StdEncoding.DecodeString(enStr)
 
 	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
+		return errors.New("unable to decode the encoded string")
 	}
 
 	usernamePassword := strings.Split(string(decodedInfo), ":")
@@ -23,38 +23,34 @@ func basicAuth(req http.Handler, w http.ResponseWriter, r *http.Request, enStr s
 	//fmt.Println("password :", usernamePassword[1])
 
 	if model.UserInfo[usernamePassword[0]] != usernamePassword[1] {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
+		return errors.New("wrong username or password")
 	}
 
-	req.ServeHTTP(w, r)
+	return nil
+	//req.ServeHTTP(w, r)
 }
 
-func bearerAuth(req http.Handler, w http.ResponseWriter, r *http.Request, tokenStr string) {
+func bearerAuth(tokenStr string) error {
 	fmt.Println(tokenStr)
 	token, err := jwt.Parse(tokenStr, func(tkn *jwt.Token) (interface{}, error) {
 		if _, ok := tkn.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Unexpected signing method: %v", tkn.Header["alg"])
+			return nil, fmt.Errorf("unexpected signing method: %v", tkn.Header["alg"])
 		}
 
 		return []byte(model.ServerSecretKey), nil
 	})
 
-	clms, ok := token.Claims.(jwt.MapClaims)
+	//clms, ok := token.Claims.(jwt.MapClaims)
+	_, ok := token.Claims.(jwt.MapClaims)
 
-	fmt.Println(clms)
-	fmt.Println(ok)
-	fmt.Println(token.Valid)
+	//fmt.Println(clms)
+	//fmt.Println(ok)
+	//fmt.Println(token.Valid)
 
-	if ok && token.Valid {
-		//fmt.Println("Token Matched !!!!")
-		fmt.Println(clms["userName"])
-		//w.Write([]byte("Token Matched, valid user"))
-
-		req.ServeHTTP(w, r)
-	} else {
-		fmt.Println("last error ", err)
+	if !ok || !token.Valid || err != nil {
+		return errors.New("signature mismatch")
 	}
+	return nil
 }
 
 func Authentication(next http.Handler) http.Handler {
@@ -76,11 +72,22 @@ func Authentication(next http.Handler) http.Handler {
 			return
 		}
 
+		var err error
+
 		if authorizationInfo[0] == "Basic" {
-			basicAuth(next, w, r, authorizationInfo[1])
+			err = basicAuth(authorizationInfo[1])
 		} else if authorizationInfo[0] == "Bearer" {
-			bearerAuth(next, w, r, authorizationInfo[1])
+			err = bearerAuth(authorizationInfo[1])
+		} else {
+			w.WriteHeader(http.StatusBadRequest)
+			return
 		}
+
+		if err != nil {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+		next.ServeHTTP(w, r)
 
 		return
 	})

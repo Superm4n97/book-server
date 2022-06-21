@@ -15,16 +15,22 @@ import (
 var Books = make(map[int]model.Book)
 
 func GetBookInfoWithID(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
 	bookId := chi.URLParam(r, "id")
 	bid, err := strconv.Atoi(bookId)
 
-	if err != nil || Books[bid].Title == "" {
-		w.WriteHeader(http.StatusBadRequest)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte("Invalid book id"))
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	if _, ok := Books[bid]; !ok {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
 	err = json.NewEncoder(w).Encode(Books[bid])
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -68,6 +74,11 @@ func AddNewBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if _, ok := Books[book.Id]; ok {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	Books[book.Id] = book
 
 	err = json.NewEncoder(w).Encode(book)
@@ -84,8 +95,13 @@ func UpdateBookInformation(w http.ResponseWriter, r *http.Request) {
 	stBookId := chi.URLParam(r, "id")
 	bookId, err := strconv.Atoi(stBookId)
 
-	if err != nil || Books[bookId].Title == "" {
-		w.WriteHeader(http.StatusBadRequest)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	if _, ok := Books[bookId]; !ok {
+		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
@@ -104,7 +120,6 @@ func UpdateBookInformation(w http.ResponseWriter, r *http.Request) {
 
 	Books[bookId] = book
 
-	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(book)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -119,12 +134,18 @@ func RemoveBookFromList(w http.ResponseWriter, r *http.Request) {
 	strBookId := chi.URLParam(r, "id")
 	bookId, err := strconv.Atoi(strBookId)
 
-	if err != nil || Books[bookId].Title == "" {
-		w.WriteHeader(http.StatusBadRequest)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	if _, ok := Books[bookId]; !ok {
+		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
 	delete(Books, bookId)
+
 	w.WriteHeader(http.StatusOK)
 	return
 }
@@ -140,22 +161,27 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	infoStr := strings.Split(headerString, " ")
 
 	if len(infoStr) != 2 || infoStr[0] != "Basic" {
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
-	temp, _ := base64.StdEncoding.DecodeString(infoStr[1])
+	temp, err := base64.StdEncoding.DecodeString(infoStr[1])
+
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
 	infoStr = strings.Split(string(temp), ":")
 
 	if model.UserInfo[infoStr[0]] != infoStr[1] {
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
-	//
 	//============GENERATE TOKEN===================
 	st := middlewares.CreateJwtToken(infoStr[0], infoStr[1])
-	_, err := w.Write([]byte(st))
+	_, err = w.Write([]byte(st))
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
