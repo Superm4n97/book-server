@@ -13,6 +13,7 @@ func pong(w http.ResponseWriter, r *http.Request) {
 	_, err := w.Write([]byte("pong"))
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte(err.Error()))
 		return
 	}
 

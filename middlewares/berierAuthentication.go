@@ -18,6 +18,7 @@ func BearerAuthentication(req http.Handler) http.Handler {
 
 		if len(infoString) != 2 || infoString[0] != "Bearer" {
 			w.WriteHeader(http.StatusUnauthorized)
+			w.Write([]byte("invalid bearer token"))
 			return
 		}
 
