@@ -85,6 +85,7 @@ func Authentication(next http.Handler) http.Handler {
 
 		if err != nil {
 			w.WriteHeader(http.StatusUnauthorized)
+			w.Write([]byte(err.Error()))
 			return
 		}
 		next.ServeHTTP(w, r)

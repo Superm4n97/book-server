@@ -5,6 +5,7 @@ import (
 	"github.com/Superm4n97/Book-Server/handlers"
 	"github.com/Superm4n97/Book-Server/middlewares"
 	"github.com/go-chi/chi/v5"
+	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"net/http"
 )
 
@@ -22,8 +23,11 @@ func pong(w http.ResponseWriter, r *http.Request) {
 func main() {
 	r := chi.NewRouter()
 
+	r.Use(chimiddleware.Logger)
+
 	//r.Use(middlewares.Authentication)
 	r.Get("/ping", pong)
+
 	r.Route("/apis/v1/books", func(r chi.Router) {
 		//r.Use(middlewares.Authentication)
 		r.Use(middlewares.Authentication)
@@ -77,4 +81,8 @@ Admin JWT Token
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXNzIjoiMTIzNCIsInVzZXJOYW1lIjoiYWRtaW4ifQ.DX81oiggc9PA0qhU-LSJflUUTmqfOU1sig4wk39DPmA
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXNzIjoiMTIzNCIsInVzZXJOYW1lIjoiYWRtaW4ifQ.DX81oiggc9PA0qhU-LSJflUUTmqfOU1sig4wk39DPmA
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6IjEyMzQifQ.-i0If6mLRGHQeXDkK_NQbqxjfJbvKXcVU6GF6e55FuM
+
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6IjEyMzQifQ.-i0If6mLRGHQeXDkK_NQbqxjfJbvKXcVU6GF6e55FuM
+
+'{"id":1,"title":"llad","isbn":"4324","authors":[{"name":"abul","email":"abul@gmail.com","city":"dhaka"}]}'
 */

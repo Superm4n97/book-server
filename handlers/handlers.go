@@ -176,6 +176,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	if model.UserInfo[infoStr[0]] != infoStr[1] {
 		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte("Wrong username or password"))
 		return
 	}
 
