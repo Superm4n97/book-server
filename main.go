@@ -1,12 +1,15 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"github.com/Superm4n97/Book-Server/handlers"
 	"github.com/Superm4n97/Book-Server/middlewares"
 	"github.com/go-chi/chi/v5"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"net/http"
+	"os"
+	"os/signal"
 )
 
 func pong(w http.ResponseWriter, r *http.Request) {
@@ -48,11 +51,29 @@ func main() {
 	//r.Delete("/apis/v1/books/{id}", handlers.RemoveBookFromList)
 
 	fmt.Println("Server Running on port: 8080")
-	err := http.ListenAndServe(":8080", r)
-	if err != nil {
-		fmt.Println("Failed to start the server")
+	stopCh := make(chan os.Signal, 1)
+	signal.Notify(stopCh, os.Interrupt)
+
+	server := &http.Server{
+		Addr:    ":8080",
+		Handler: r,
+	}
+
+	go func() {
+		err := server.ListenAndServe()
+		if err != nil {
+			fmt.Println(err.Error())
+			return
+		}
+	}()
+
+	<-stopCh
+	fmt.Println("Server is shutting down!!")
+	if err := server.Shutdown(context.Background()); err != nil {
+		fmt.Println("failed to shutdown the server")
 		return
 	}
+	fmt.Println("Server is gracefully shutdown")
 }
 
 /*
