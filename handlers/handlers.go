@@ -85,6 +85,7 @@ func AddNewBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Write([]byte("book successfully added. "))
 	Books[book.Id] = book
 
 	err = json.NewEncoder(w).Encode(book)
@@ -131,7 +132,7 @@ func UpdateBookInformation(w http.ResponseWriter, r *http.Request) {
 
 	Books[bookId] = book
 
-	w.Write([]byte("book successfully added"))
+	w.Write([]byte("book successfully updated"))
 
 	err = json.NewEncoder(w).Encode(book)
 	if err != nil {
