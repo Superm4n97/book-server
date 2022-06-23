@@ -131,6 +131,8 @@ func UpdateBookInformation(w http.ResponseWriter, r *http.Request) {
 
 	Books[bookId] = book
 
+	w.Write([]byte("book successfully added"))
+
 	err = json.NewEncoder(w).Encode(book)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -161,6 +163,7 @@ func RemoveBookFromList(w http.ResponseWriter, r *http.Request) {
 	delete(Books, bookId)
 
 	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("book successfully deleted"))
 	return
 }
 
@@ -196,6 +199,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Wrong username or password"))
 		return
 	}
+
+	w.Write([]byte("successfully logged in. bearer token -> "))
 
 	//============GENERATE TOKEN===================
 	st := auth.CreateJwtToken(infoStr[0], infoStr[1])
