@@ -111,7 +111,7 @@ func UpdateBookInformation(w http.ResponseWriter, r *http.Request) {
 
 	if _, ok := Books[bookId]; !ok {
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte(fmt.Sprintf("no book with id ", bookId)))
+		w.Write([]byte(fmt.Sprintf("no book with id %d", bookId)))
 		return
 	}
 

@@ -1,7 +1,5 @@
 package model
 
-import "os"
-
 type Author struct {
 	Name  string `json:"name"`
 	Email string `json:"email"`
@@ -15,9 +13,10 @@ type Book struct {
 }
 
 var UserInfo = map[string]string{
-	//"admin": "1234",
-	os.Getenv("UNAME"): os.Getenv("UPASS"),
+	"admin": "1234",
+	//os.Getenv("UNAME"): os.Getenv("UPASS"),
 }
 
-//var ServerSecretKey = "Superm4n"
-var ServerSecretKey = os.Getenv("SSKEY")
+var ServerSecretKey = "Superm4n"
+
+//var ServerSecretKey = os.Getenv("SSKEY")
