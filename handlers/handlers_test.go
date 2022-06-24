@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"bytes"
-	"encoding/base64"
+	"github.com/Superm4n97/Book-Server/auth"
 	"github.com/Superm4n97/Book-Server/middlewares"
 	"github.com/Superm4n97/Book-Server/model"
 	"github.com/go-chi/chi/v5"
@@ -110,21 +110,21 @@ func TestLogin(t *testing.T) {
 			rurl:           "/apis/v1/login",
 			body:           nil,
 			expectedStatus: 200,
-			authen:         "Basic " + base64.StdEncoding.EncodeToString([]byte("admin:1234")),
+			authen:         "Basic " + auth.GetBasicToken(),
 		},
 		{
 			method:         "POST",
 			rurl:           "/apis/v1/login",
 			body:           nil,
 			expectedStatus: 401, //wrong username or password
-			authen:         "Basic " + base64.StdEncoding.EncodeToString([]byte("admin:12345")),
+			authen:         "Basic 12" + auth.GetBasicToken(),
 		},
 		{
 			method:         "POST",
 			rurl:           "/apis/v1/login",
 			body:           nil,
 			expectedStatus: 401,
-			authen:         "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6IjEyMzQifQ.-i0If6mLRGHQeXDkK_NQbqxjfJbvKXcVU6GF6e55FuM",
+			authen:         "Bearer " + auth.GetBearerToken(),
 		},
 	}
 
@@ -151,9 +151,7 @@ func TestGetAllBooks(t *testing.T) {
 			rurl:           "/apis/v1/books",
 			body:           nil,
 			expectedStatus: 200,
-			authen:         "Basic " + base64.StdEncoding.EncodeToString([]byte("admin:1234")),
-			//authen:         "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6IjEyMzQifQ.-i0If6mLRGHQeXDkK_NQbqxjfJbvKXcVU6GF6e55FuM",
-
+			authen:         "Basic " + auth.GetBasicToken(),
 		},
 	}
 	for _, test := range tests {
@@ -175,13 +173,13 @@ func TestGetBookInfoWithID(t *testing.T) {
 			rurl:           "/apis/v1/books/1",
 			body:           nil,
 			expectedStatus: 200,
-			authen:         "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6IjEyMzQifQ.-i0If6mLRGHQeXDkK_NQbqxjfJbvKXcVU6GF6e55FuM",
+			authen:         "Bearer " + auth.GetBearerToken(),
 		},
 		{
 			method:         "GET",
 			rurl:           "/apis/v1/books/7",
 			expectedStatus: 404,
-			authen:         "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6IjEyMzQifQ.-i0If6mLRGHQeXDkK_NQbqxjfJbvKXcVU6GF6e55FuM",
+			authen:         "Bearer " + auth.GetBearerToken(),
 		},
 	}
 
@@ -221,7 +219,7 @@ func TestAddNewBook(t *testing.T) {
     ]
 }`)),
 			expectedStatus: 200,
-			authen:         "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6IjEyMzQifQ.-i0If6mLRGHQeXDkK_NQbqxjfJbvKXcVU6GF6e55FuM",
+			authen:         "Bearer " + auth.GetBearerToken(),
 		},
 		{
 			method: "POST",
@@ -244,7 +242,7 @@ func TestAddNewBook(t *testing.T) {
     ]
 }`)),
 			expectedStatus: 400,
-			authen:         "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6IjEyMzQifQ.-i0If6mLRGHQeXDkK_NQbqxjfJbvKXcVU6GF6e55FuM",
+			authen:         "Bearer " + auth.GetBearerToken(),
 		},
 	}
 
@@ -284,7 +282,7 @@ func TestUpdateBookInformation(t *testing.T) {
     ]
 }`)),
 			expectedStatus: 200,
-			authen:         "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6IjEyMzQifQ.-i0If6mLRGHQeXDkK_NQbqxjfJbvKXcVU6GF6e55FuM",
+			authen:         "Bearer " + auth.GetBearerToken(),
 		},
 		{
 			method: "PUT",
@@ -307,7 +305,7 @@ func TestUpdateBookInformation(t *testing.T) {
     ]
 }`)),
 			expectedStatus: 404,
-			authen:         "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6IjEyMzQifQ.-i0If6mLRGHQeXDkK_NQbqxjfJbvKXcVU6GF6e55FuM",
+			authen:         "Bearer " + auth.GetBearerToken(),
 		},
 		{
 			method: "PUT",
@@ -330,7 +328,7 @@ func TestUpdateBookInformation(t *testing.T) {
     ]
 }`)),
 			expectedStatus: 400,
-			authen:         "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6IjEyMzQifQ.-i0If6mLRGHQeXDkK_NQbqxjfJbvKXcVU6GF6e55FuM",
+			authen:         "Bearer " + auth.GetBearerToken(),
 		},
 	}
 
@@ -354,14 +352,14 @@ func TestRemoveBookFromList(t *testing.T) {
 			rurl:           "/apis/v1/books/5",
 			body:           nil,
 			expectedStatus: 200,
-			authen:         "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6IjEyMzQifQ.-i0If6mLRGHQeXDkK_NQbqxjfJbvKXcVU6GF6e55FuM",
+			authen:         "Bearer " + auth.GetBearerToken(),
 		},
 		{
 			method:         "DELETE",
 			rurl:           "/apis/v1/books/5",
 			body:           nil,
 			expectedStatus: 404,
-			authen:         "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6IjEyMzQifQ.-i0If6mLRGHQeXDkK_NQbqxjfJbvKXcVU6GF6e55FuM",
+			authen:         "Bearer " + auth.GetBearerToken(),
 		},
 	}
 
