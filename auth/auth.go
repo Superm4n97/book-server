@@ -65,3 +65,11 @@ func CreateJwtToken(username string, password string) string {
 	//fmt.Println(tokenString, err)
 	return tokenString
 }
+
+func GetBasicToken() string {
+	return base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:%s", model.UNAME, model.UPASS)))
+}
+
+func GetBearerToken() string {
+	return CreateJwtToken(model.UNAME, model.UPASS)
+}

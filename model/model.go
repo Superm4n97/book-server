@@ -12,11 +12,17 @@ type Book struct {
 	Authors []Author `json:"authors"`
 }
 
-var UserInfo = map[string]string{
-	"admin": "1234",
-	//os.Getenv("UNAME"): os.Getenv("UPASS"),
-}
+//read form environment variable
+//os.Getenv("UNAME")
+//os.Getenv("UPASS")
+//var ServerSecretKey = os.Getenv("SSKEY")
 
+//testing purpose
+var UNAME = "admin"
+var UPASS = "1234"
 var ServerSecretKey = "Superm4n"
 
-//var ServerSecretKey = os.Getenv("SSKEY")
+//store in userinfo database
+var UserInfo = map[string]string{
+	UNAME: UPASS,
+}
